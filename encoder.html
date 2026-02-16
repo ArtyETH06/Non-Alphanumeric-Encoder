@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>NAD — Encoder</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header neon">
+    <div class="header-left">
+      <div class="logo" aria-hidden="true">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="20" height="20" rx="4" fill="#071014" stroke="#7dd3fc" stroke-width="0.8"/>
+          <text x="50%" y="58%" fill="#7dd3fc" font-family="monospace" font-size="11" text-anchor="middle">NAD</text>
+        </svg>
+      </div>
+      <div>
+        <h1 class="logo-title">Non-Alphanumeric-Decoder <span class="muted">(NAD)</span></h1>
+        <p class="tag">Encoder — generate non-alphanumeric XOR payloads</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <nav class="top-nav">
+        <a href="index.html">Home</a>
+        <a href="encoder.html">Encoder</a>
+        <a href="decoder.html">Decoder</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container single">
+    <section class="card">
+      <h2>Encoder</h2>
+      <label for="plain">Text to encode</label>
+      <textarea id="plain" placeholder="e.g. cat /etc/passwd"></textarea>
+      <div class="row">
+        <button id="encode">Encode</button>
+        <button id="copy">Copy</button>
+      </div>
+      <label for="payload">Payload (to post)</label>
+      <textarea id="payload" placeholder="Generated payload will appear here"></textarea>
+      <p class="note">The encoder selects the first printable non-alphanumeric XOR pair per character.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="credit">Non-Alphanumeric-Decoder — demo only</div>
+    <div class="credit">dev by Arty</div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
