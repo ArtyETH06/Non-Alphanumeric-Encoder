@@ -33,18 +33,46 @@ for(let i=0;i<nonAlpha.length;i++){
 }
 
 function encode(text){
-  const parts = [];
+  // Tokenize into words (alphanumeric sequences) and single-char tokens (punctuation, spaces)
+  const tokens = [];
+  let cur = '';
   for(const ch of text){
-    if(pairMap[ch] && pairMap[ch].length>0){
-      const p = pairMap[ch][0];
-      // produce a short expression: ("a"^"b")
-      parts.push('("'+escapeForExpr(p[0])+'"^"'+escapeForExpr(p[1])+'")');
+    if(/[A-Za-z0-9]/.test(ch)){
+      cur += ch;
     } else {
-      // fallback: placeholder
-      parts.push('"?"');
+      if(cur.length) { tokens.push({type:'word', val:cur}); cur = ''; }
+      tokens.push({type:'char', val:ch});
     }
   }
-  return parts.join(' . ');
+  if(cur.length) tokens.push({type:'word', val:cur});
+
+  function encChar(ch){
+    if(pairMap[ch] && pairMap[ch].length>0){
+      const p = pairMap[ch][0];
+      return '("'+escapeForExpr(p[0])+'"^"'+escapeForExpr(p[1])+'")';
+    }
+    return '"'+escapeForExpr(ch)+'"';
+  }
+
+  function prettyJoin(parts, perLine=6, indent='  '){
+    if(parts.length === 0) return '';
+    if(parts.length <= perLine) return parts.join(' . ');
+    const lines = [];
+    for(let i=0;i<parts.length;i+=perLine){
+      lines.push(indent + parts.slice(i,i+perLine).join(' . '));
+    }
+    return lines.join('\n');
+  }
+
+  const blocks = tokens.map(token => {
+    const chars = token.val.split('');
+    const parts = chars.map(c => encChar(c));
+    const inner = prettyJoin(parts, 6, '  ');
+    return '(\n' + (inner ? inner + '\n' : '') + ')';
+  });
+
+  // Join blocks with a blank line for clearer structure
+  return blocks.join('\n\n');
 }
 
 function escapeForExpr(ch){
@@ -54,12 +82,17 @@ function escapeForExpr(ch){
 }
 
 function decodeExpr(expr){
-  const re = /\"(.*?)\"\s*\^\s*\"(.*?)\"/g;
+  // Match either "a" ^ "b" pairs or plain quoted "c" fallbacks.
+  const re = /"((?:\\.|[^"\\])*)"\s*\^\s*"((?:\\.|[^"\\])*)"|"((?:\\.|[^"\\])*)"/g;
   let m; const out = [];
   while((m = re.exec(expr)) !== null){
-    const a = unescapeFromExpr(m[1]);
-    const b = unescapeFromExpr(m[2]);
-    out.push(String.fromCharCode(a.charCodeAt(0) ^ b.charCodeAt(0)));
+    if(m[1] !== undefined && m[2] !== undefined && m[1] !== ''){
+      const a = unescapeFromExpr(m[1]);
+      const b = unescapeFromExpr(m[2]);
+      out.push(String.fromCharCode(a.charCodeAt(0) ^ b.charCodeAt(0)));
+    } else if(m[3] !== undefined){
+      out.push(unescapeFromExpr(m[3]));
+    }
   }
   return out.join('');
 }
@@ -99,13 +132,34 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
   if(copyBtn && output){
     copyBtn.addEventListener('click', ()=>{
+      // copy output text
       output.select();
       document.execCommand('copy');
+      // give visual feedback
+      copyBtn.classList.add('copied');
+      const prev = copyBtn.textContent;
+      copyBtn.textContent = 'Copied!';
+      setTimeout(()=>{
+        copyBtn.classList.remove('copied');
+        copyBtn.textContent = prev;
+        try{ window.getSelection().removeAllRanges(); }catch(e){}
+      }, 1000);
     });
   }
 
   if(toggle && toolTitle){
     toggle.addEventListener('click', ()=>{
+      // if there is content in either field, swap them when toggling
+      const vIn = input ? (input.value || '') : '';
+      const vOut = output ? (output.value || '') : '';
+      if((vIn && vIn.trim()!=='') || (vOut && vOut.trim()!=='') ){
+        // swap values
+        if(input && output){
+          const tmp = input.value;
+          input.value = output.value;
+          output.value = tmp;
+        }
+      }
       mode = (mode === 'encode') ? 'decode' : 'encode';
       toolTitle.textContent = mode === 'encode' ? 'Encode' : 'Decode';
       // rotate toggle visually

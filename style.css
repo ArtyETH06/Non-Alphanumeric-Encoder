@@ -5,24 +5,7 @@
   --accent:#7dd3fc;
   --text:#e6eef6;
   --border: #1f2933;
-}
-/*
-  This repository now keeps the canonical frontend files under src/
-  Please open or serve the files in src/html/, src/css/ and src/js/.
-
-  Canonical files:
-  - src/html/index.html
-  - src/html/how.html
-  - src/css/style.css
-  - src/js/script.js
-
-*/
-:root{
-  --bg:#0f1114;
-  --card:#121316;
-  --muted:#9aa3b2;
-  --accent:#7dd3fc;
-  --text:#e6eef6;
+/* This file was replaced. The canonical styles are in src/css/style.css */
   --border: #1f2933;
 }
 *{box-sizing:border-box}

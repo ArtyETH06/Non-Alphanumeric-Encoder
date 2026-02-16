@@ -61,21 +61,16 @@ if (isset($_POST['input'])) {
   try {
     echo evaluate_expr($_POST['input']);
   } catch (\Exception $e) {
-    echo 'Invalid expression';
-  }
-}
-?&gt;</pre>
-
-    <p class="note">This evaluator accepts only numbers, parentheses and + - * /. It contains no <code>eval</code> and cannot be used to call functions or read files.</p>
-  </section>
-  </main>
-
-  <footer class="site-footer">
-    <div class="credit">Non-Alphanumeric-Encoder tool — cause why not</div>
-    <div class="credit">By Arty</div>
+    <!doctype html>
+    <html lang="en">
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>How it works — Redirect</title>
+        <meta http-equiv="refresh" content="0; url=src/html/how.html">
+      </head>
+      <body>
+        <p>Redirecting to <a href="src/html/how.html">src/html/how.html</a>.</p>
+      </body>
+    </html>
   </footer>
-
-  </div><!-- .site-wrapper -->
-  <script src="script.js"></script>
-</body>
-</html>
