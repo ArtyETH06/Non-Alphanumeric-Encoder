@@ -30,7 +30,7 @@
       <div class="io-wrap">
         <div class="io-col">
           <label for="input">Input</label>
-          <textarea id="input" placeholder="Type text to encode (live) or paste payload to decode"></textarea>
+          <textarea id="input" placeholder="eg: ls  (type here or paste payload to decode)"></textarea>
         </div>
 
         <button id="mode-toggle" class="mode-toggle" aria-label="Toggle mode">▼</button>
@@ -40,6 +40,15 @@
           <textarea id="output" readonly placeholder="Encoded payload or decoded result will appear here"></textarea>
           <div class="row">
             <button id="copy" class="btn-copy" title="Copy output">Copy output</button>
+          </div>
+
+          <div id="variants-panel" class="variants-panel">
+            <div class="variants-header">
+              <label><input type="checkbox" id="pref-literals"> Prefer literals</label>
+              <button id="gen-variants" class="btn-small">Show variants</button>
+              <button id="magic-variant" class="btn-small">Magic variant</button>
+            </div>
+            <div id="variants-list" class="variants-list" aria-live="polite"></div>
           </div>
         </div>
       </div>

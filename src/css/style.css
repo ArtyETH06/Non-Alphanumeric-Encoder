@@ -38,7 +38,7 @@ body{
 .toggle{background:transparent;border:1px solid var(--accent);color:var(--accent);padding:6px 10px;border-radius:6px;cursor:pointer}
 .tool-panel{margin-top:6px}
 .hidden{display:none}
-.full-height-tool{min-height:0;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:16px 0}
+.full-height-tool{min-height:0;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:6px 0}
 .tool-card{display:flex;flex-direction:column;gap:10px}
 .tool-card .tool-panel{flex:1;display:flex;flex-direction:column;gap:12px}
 .tool-card .tool-panel textarea{flex:1;min-height:180px}
@@ -52,24 +52,24 @@ pre.code{background:#0b0f12;padding:14px;border-radius:8px;overflow:auto;color:v
 
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 .col{display:flex;flex-direction:column;gap:12px}
-.row{display:flex;gap:6px;margin-top:22px}
+.row{display:flex;gap:6px;margin-top:40px}
 .right .card{min-height:120px}
 label{display:block;margin-bottom:8px;color:var(--muted);font-size:14px}
 .label{display:block;margin-bottom:6px;color:var(--muted);font-size:13px}
 label{display:block;margin-bottom:6px;color:var(--muted);font-size:13px}
 label{display:block;margin-bottom:6px;color:var(--muted);font-size:13px}
-.io-col textarea{width:100%;min-height:240px;max-height:520px;background:#061018;border:1px solid rgba(32,48,58,0.6);color:var(--text);padding:14px;border-radius:10px;font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;line-height:1.5;font-size:13px;margin:0;white-space:pre-wrap;word-break:break-word}
+.io-col textarea{box-sizing:border-box;width:100%;max-width:100%;min-height:140px;max-height:640px;background:#061018;border:1px solid rgba(32,48,58,0.6);color:var(--text);padding:12px;border-radius:10px;font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;line-height:1.5;font-size:13px;margin:0;white-space:pre-wrap;word-break:break-word}
 .btn-copy{background:var(--accent);color:#05131a;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;box-shadow:0 8px 20px rgba(125,211,252,0.06);transition:transform .15s ease, box-shadow .15s ease}
 .btn-copy:hover{transform:translateY(-3px);box-shadow:0 18px 40px rgba(125,211,252,0.12)}
 
 /* Layout: vertical stack, centered content */
 .io-wrap{display:flex;flex-direction:column;gap:4px;align-items:stretch}
-.io-col{width:100%;max-width:100%;display:flex;flex-direction:column;gap:6px;padding:0 24px}
+.io-col{width:100%;max-width:100%;display:flex;flex-direction:column;gap:6px;padding:0}
 .mode-toggle{width:56px;height:56px;border-radius:50%;background:linear-gradient(180deg, rgba(10,14,18,1), rgba(6,8,10,1));border:1px solid rgba(125,211,252,0.12);color:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .12s ease;margin:0 auto}
 .mode-toggle.rotate{transform:rotate(180deg)}
 
 /* Keep the tool card centered and compact */
-.card.full-height-tool{max-width:1400px;width:1100px;max-width:96%;margin:auto;padding:14px}
+.card.full-height-tool{width:1200px;max-width:96%;margin:auto;padding:12px 28px}
 
 .tool-card h2{margin-top:2px;margin-bottom:6px}
 
@@ -85,3 +85,12 @@ label{display:block;margin-bottom:6px;color:var(--muted);font-size:13px}
 
 .site-footer{padding:18px;text-align:center;color:var(--muted);font-size:13px;border-top:1px solid var(--border);}
 .site-footer .credit{color:var(--muted);font-size:13px}
+
+/* variants panel */
+.variants-panel{margin-top:12px;border-top:1px solid rgba(255,255,255,0.02);padding-top:10px}
+.variants-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.btn-small{background:transparent;border:1px solid rgba(125,211,252,0.12);color:var(--accent);padding:6px 8px;border-radius:8px;cursor:pointer}
+.variants-list{display:flex;flex-direction:column;gap:8px;max-height:260px;overflow:auto}
+.variant-item{display:flex;gap:8px;align-items:flex-start;justify-content:space-between;background:#071017;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.02)}
+.variant-item pre{margin:0;color:var(--muted);font-size:12px;white-space:pre-wrap}
+.btn-variant{background:var(--accent);color:#05131a;border:none;padding:6px 10px;border-radius:8px;cursor:pointer}

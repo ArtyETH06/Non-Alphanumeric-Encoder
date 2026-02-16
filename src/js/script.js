@@ -33,46 +33,34 @@ for(let i=0;i<nonAlpha.length;i++){
 }
 
 function encode(text){
-  // Tokenize into words (alphanumeric sequences) and single-char tokens (punctuation, spaces)
-  const tokens = [];
-  let cur = '';
-  for(const ch of text){
-    if(/[A-Za-z0-9]/.test(ch)){
-      cur += ch;
-    } else {
-      if(cur.length) { tokens.push({type:'word', val:cur}); cur = ''; }
-      tokens.push({type:'char', val:ch});
-    }
-  }
-  if(cur.length) tokens.push({type:'word', val:cur});
-
-  function encChar(ch){
-    if(pairMap[ch] && pairMap[ch].length>0){
-      const p = pairMap[ch][0];
-      return '("'+escapeForExpr(p[0])+'"^"'+escapeForExpr(p[1])+'")';
-    }
-    return '"'+escapeForExpr(ch)+'"';
-  }
-
-  function prettyJoin(parts, perLine=6, indent='  '){
-    if(parts.length === 0) return '';
-    if(parts.length <= perLine) return parts.join(' . ');
-    const lines = [];
-    for(let i=0;i<parts.length;i+=perLine){
-      lines.push(indent + parts.slice(i,i+perLine).join(' . '));
-    }
-    return lines.join('\n');
-  }
+  // Tokenize into words (alphanumeric sequences) and single-char tokens
+  const tokens = text.match(/[A-Za-z0-9]+|./g) || [];
 
   const blocks = tokens.map(token => {
-    const chars = token.val.split('');
-    const parts = chars.map(c => encChar(c));
-    const inner = prettyJoin(parts, 6, '  ');
-    return '(\n' + (inner ? inner + '\n' : '') + ')';
+    const parts = [];
+    for(let i=0;i<token.length;i++){
+      const ch = token[i];
+      // prefer literal quoted tokens for parentheses so they are always preserved on decode
+      if(ch === '(' || ch === ')'){
+        parts.push('("'+escapeForExpr(ch)+'")');
+        continue;
+      }
+      if(pairMap[ch] && pairMap[ch].length>0){
+        const p = pairMap[ch][0];
+        parts.push('("'+escapeForExpr(p[0])+'"^"'+escapeForExpr(p[1])+'")');
+      } else {
+        parts.push('("'+escapeForExpr(ch)+'")');
+      }
+    }
+    const lines = parts.map((expr, idx) => {
+      const dot = (idx < parts.length - 1) ? ' .' : '';
+      return '  ' + expr + dot;
+    });
+    return '( ' + '\n' + lines.join('\n') + '\n' + ' )';
   });
 
-  // Join blocks with a blank line for clearer structure
-  return blocks.join('\n\n');
+  // join token blocks with PHP concatenation operator so resulting string is valid PHP
+  return blocks.join(' . ');
 }
 
 function escapeForExpr(ch){
@@ -82,14 +70,53 @@ function escapeForExpr(ch){
 }
 
 function decodeExpr(expr){
-  // Match either "a" ^ "b" pairs or plain quoted "c" fallbacks.
+  // Robust regex-based parser: scan the whole expression for quoted tokens
+  // and XOR pairs in order, ignoring whitespace/parentheses/dot separators.
   const re = /"((?:\\.|[^"\\])*)"\s*\^\s*"((?:\\.|[^"\\])*)"|"((?:\\.|[^"\\])*)"/g;
   let m; const out = [];
   while((m = re.exec(expr)) !== null){
     if(m[1] !== undefined && m[2] !== undefined && m[1] !== ''){
       const a = unescapeFromExpr(m[1]);
       const b = unescapeFromExpr(m[2]);
-      out.push(String.fromCharCode(a.charCodeAt(0) ^ b.charCodeAt(0)));
+      if(a.length === b.length){
+        for(let k=0;k<a.length;k++) out.push(String.fromCharCode(a.charCodeAt(k) ^ b.charCodeAt(k)));
+      } else {
+        // XOR up to min length. If one side has a short remainder that is only spaces,
+        // treat it as an encoding artifact and ignore it (fixes cases like "% "^"@" -> extra space).
+        const minLen = Math.min(a.length, b.length);
+        for(let k=0;k<minLen;k++) out.push(String.fromCharCode(a.charCodeAt(k) ^ b.charCodeAt(k)));
+        const remA = a.slice(minLen);
+        const remB = b.slice(minLen);
+        // ignore remainders that are purely whitespace
+        const isBlankA = remA === '' || /^\s+$/.test(remA);
+        const isBlankB = remB === '' || /^\s+$/.test(remB);
+        if(!isBlankA && remA !== '') out.push(remA);
+        if(!isBlankB && remB !== '') out.push(remB);
+      }
+    } else if(m[3] !== undefined){
+      out.push(unescapeFromExpr(m[3]));
+    }
+  }
+  return out.join('');
+}
+
+// Fallback regex parser (keeps previous behavior) in case sequential parse produced nothing
+function decodeExprFallback(expr){
+  // Keep a fallback that mirrors the robust behavior (handles multi-char pairs)
+  const re = /"((?:\\.|[^"\\])*)"\s*\^\s*"((?:\\.|[^"\\])*)"|"((?:\\.|[^"\\])*)"/g;
+  let m; const out = [];
+  while((m = re.exec(expr)) !== null){
+    if(m[1] !== undefined && m[2] !== undefined && m[1] !== ''){
+      const a = unescapeFromExpr(m[1]);
+      const b = unescapeFromExpr(m[2]);
+      if(a.length === b.length){
+        for(let k=0;k<a.length;k++) out.push(String.fromCharCode(a.charCodeAt(k) ^ b.charCodeAt(k)));
+      } else {
+        const minLen = Math.min(a.length, b.length);
+        for(let k=0;k<minLen;k++) out.push(String.fromCharCode(a.charCodeAt(k) ^ b.charCodeAt(k)));
+        if(a.length > minLen) out.push(a.slice(minLen));
+        if(b.length > minLen) out.push(b.slice(minLen));
+      }
     } else if(m[3] !== undefined){
       out.push(unescapeFromExpr(m[3]));
     }
@@ -108,6 +135,11 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const copyBtn = document.getElementById('copy');
   const toggle = document.getElementById('mode-toggle');
   const toolTitle = document.getElementById('tool-title');
+  const variantsPanel = document.getElementById('variants-panel');
+  const variantsList = document.getElementById('variants-list');
+  const genVariantsBtn = document.getElementById('gen-variants');
+  const prefLiteralsChk = document.getElementById('pref-literals');
+  const magicBtn = document.getElementById('magic-variant');
 
   // mode: 'encode' or 'decode'
   let mode = 'encode';
@@ -118,8 +150,71 @@ document.addEventListener('DOMContentLoaded', ()=>{
     if(mode === 'encode') {
       output.value = encode(v);
     } else {
-      output.value = decodeExpr(v);
+  const decoded = decodeExpr(v);
+  output.value = (decoded === '' && v.trim() !== '') ? decodeExprFallback(v) : decoded;
     }
+  }
+
+  // generate multiple variants for the current input and show them in the variants panel
+  function generateVariants(text, count=6, preferLiterals=false){
+    // deterministic pseudo-random based on index to keep variants stable per generation
+    function prng(seed){
+      let s = seed >>> 0;
+      return function(){ s = Math.imul(48271, s) % 0x7fffffff; return s / 0x7fffffff; };
+    }
+
+    const variants = [];
+    for(let v=0; v<count; v++){
+      const rnd = prng(1000 + v);
+      // make a variant by walking tokens and sometimes choosing pair or literal
+      const tokens = text.match(/[A-Za-z0-9]+|./g) || [];
+      const blocks = tokens.map(token => {
+        const parts = [];
+        for(let i=0;i<token.length;i++){
+          const ch = token[i];
+          if(ch === '(' || ch === ')'){
+            parts.push('("'+escapeForExpr(ch)+'")');
+            continue;
+          }
+          const candidates = pairMap[ch] || null;
+          const useLiteral = preferLiterals || (rnd() < 0.25) || !candidates;
+          if(!useLiteral && candidates && candidates.length>0){
+            const p = candidates[Math.floor(rnd()*candidates.length)];
+            parts.push('("'+escapeForExpr(p[0])+'"^"'+escapeForExpr(p[1])+'")');
+          } else {
+            parts.push('("'+escapeForExpr(ch)+'")');
+          }
+        }
+        const lines = parts.map((expr, idx) => {
+          const dot = (idx < parts.length - 1) ? ' .' : '';
+          return '  ' + expr + dot;
+        });
+        return '( ' + '\n' + lines.join('\n') + '\n' + ' )';
+      });
+      variants.push(blocks.join(' . '));
+    }
+    return variants;
+  }
+
+  function renderVariants(list){
+    variantsList.innerHTML = '';
+    list.forEach((v, idx) =>{
+      const item = document.createElement('div');
+      item.className = 'variant-item';
+      const pre = document.createElement('pre'); pre.textContent = v;
+      const btn = document.createElement('button'); btn.className='btn-variant'; btn.textContent = 'Use';
+      btn.addEventListener('click', ()=>{ output.value = v; });
+      item.appendChild(pre); item.appendChild(btn);
+      variantsList.appendChild(item);
+    });
+  }
+
+  // precomputed magic variants and index
+  let magicVariants = [];
+  let magicIndex = 0;
+  function ensureMagic(text){
+    magicVariants = generateVariants(text, 6, prefLiteralsChk ? prefLiteralsChk.checked : false);
+    magicIndex = 0;
   }
 
   // live encode while typing
@@ -166,6 +261,27 @@ document.addEventListener('DOMContentLoaded', ()=>{
       toggle.classList.toggle('rotate');
       // rerun transform immediately
       runTransform();
+    });
+  }
+
+  if(genVariantsBtn && variantsList){
+    genVariantsBtn.addEventListener('click', ()=>{
+      const text = input ? (input.value || '') : '';
+      const prefer = prefLiteralsChk ? prefLiteralsChk.checked : false;
+      const vars = generateVariants(text, 6, prefer);
+      renderVariants(vars);
+      // also refresh magic list
+      ensureMagic(text);
+    });
+  }
+
+  if(magicBtn){
+    magicBtn.addEventListener('click', ()=>{
+      const text = input ? (input.value || '') : '';
+      if(!text) return;
+      if(magicVariants.length === 0) ensureMagic(text);
+      output.value = magicVariants[magicIndex % magicVariants.length];
+      magicIndex++;
     });
   }
 
