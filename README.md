@@ -22,5 +22,9 @@ Interface mise à jour:
 - header avec logo et navigation (liens vers les sections Exploit / Encoder / Décoder)
 - colonne de gauche : explication pas-à-pas de l'exploit
 - colonne de droite : encodeur + décodeur interactifs
+Interface updated:
+- index.html : Exploit explanation (English)
+- encoder.html : Encoder page (English)
+- decoder.html : Decoder page (English)
 
-Footer: affichera la mention "dev by Arty".
+Footer: displays "dev by Arty".

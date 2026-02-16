@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Non-Alphanumeric-Encoder — Tool</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="site-wrapper">
+  <header class="site-header neon">
+    <div class="header-left">
+      <div>
+        <h1 class="logo-title"><a class="home-link" href="index.html">Non Alphanumeric decoder</a></h1>
+      </div>
+    </div>
+    <div class="header-right">
+      <nav class="top-nav">
+        <a href="how.html">How it works</a>
+        <a href="index.html">Encode/Decode</a>
+      </nav>
+    </div>
+  </header>
+  <main class="container single">
+    <section id="tool" class="card full-height-tool tool-card">
+      <div class="tool-header">
+        <h2 id="tool-title">Encode</h2>
+      </div>
+
+      <div class="io-wrap">
+        <div class="io-col">
+          <label for="input">Input</label>
+          <textarea id="input" placeholder="Type text to encode (live) or paste payload to decode"></textarea>
+        </div>
+
+        <button id="mode-toggle" class="mode-toggle" aria-label="Toggle mode">▼</button>
+
+        <div class="io-col">
+          <label for="output">Output</label>
+          <textarea id="output" readonly placeholder="Encoded payload or decoded result will appear here"></textarea>
+          <div class="row">
+            <button id="copy" class="btn-copy" title="Copy output">Copy output</button>
+          </div>
+        </div>
+      </div>
+
+      <p class="muted">Tip: Click the arrow between panels to switch modes; encoding runs in real-time.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="credit">Non-Alphanumeric-Encoder tool — cause why not</div>
+  <div class="credit">By Arty — fully vibe coded</div>
+  </footer>
+
+  </div><!-- .site-wrapper -->
+  <script src="../js/script.js"></script>
+</body>
+</html>

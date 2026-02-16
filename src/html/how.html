@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>How it works — Non-Alphanumeric-Encoder</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="site-wrapper">
+  <header class="site-header neon">
+    <div class="header-left">
+      <div>
+        <h1 class="logo-title"><a class="home-link" href="index.html">Non Alphanumeric decoder</a></h1>
+      </div>
+    </div>
+    <div class="header-right">
+      <nav class="top-nav">
+        <a href="how.html">How it works</a>
+        <a href="index.html">Encode/Decode</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container single">
+    <section class="card">
+      <h2>How it works</h2>
+      <p>This page explains a common vulnerability pattern and the specific technique used to bypass a naive input filter that blocks alphabetic characters only.</p>
+
+      <h3>Vulnerable code (example)</h3>
+      <pre class="code">&lt;?php
+if (isset($_POST['input'])) {
+    if (!preg_match('/[a-zA-Z`]/', $_POST['input'])) {
+        print '&lt;fieldset&gt;&lt;legend&gt;Result&lt;/legend&gt;';
+        eval('print ' . $_POST['input'] . ";");
+        print '&lt;/fieldset&gt;';
+    } else {
+        echo "&lt;p&gt;Dangerous code detected&lt;/p&gt;";
+    }
+}
+?&gt;</pre>
+
+      <h3>Why this is a problem</h3>
+      <ul>
+        <li>The code uses <code>eval</code>, which executes arbitrary PHP code built from user input.</li>
+        <li>The filter only rejects alphabetic characters and the backtick (<code>`</code>) — many other characters (symbols, digits) are allowed.</li>
+        <li>An attacker can build letters and even complete function names using operations on non-alphanumeric characters (for example, XOR <code>^</code> between two bytes), then pass the filter and execute code.</li>
+        <li>Result: full remote code execution (RCE) or information disclosure depending on server privileges.</li>
+      </ul>
+
+      <h3>How the bypass works (high level)</h3>
+      <ol>
+        <li>Use pairs of non-alphanumeric printable characters (for example <code>"#"</code> and <code>"@"</code>), XOR them (<code>"#"^"@"</code>) to produce a byte that corresponds to a letter.</li>
+        <li>Concatenate many such XOR expressions using PHP's concatenation operator <code>.</code> to form function names and strings without ever including literal letters in the POST input.</li>
+        <li>The server-side regex doesn't see letters (only expressions built from allowed characters), so the input passes the test and <code>eval</code> executes the constructed code.</li>
+      </ol>
+
+      <p class="note">This page is educational. Do not use these techniques against systems without explicit permission.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="credit">Non-Alphanumeric-Encoder tool — cause why not</div>
+    <div class="credit">By Arty — fully vibe coded</div>
+  </footer>
+
+  </div><!-- .site-wrapper -->
+  <script src="../js/script.js"></script>
+</body>
+</html>

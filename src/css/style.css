@@ -6,25 +6,6 @@
   --text:#e6eef6;
   --border: #1f2933;
 }
-/*
-  This repository now keeps the canonical frontend files under src/
-  Please open or serve the files in src/html/, src/css/ and src/js/.
-
-  Canonical files:
-  - src/html/index.html
-  - src/html/how.html
-  - src/css/style.css
-  - src/js/script.js
-
-*/
-:root{
-  --bg:#0f1114;
-  --card:#121316;
-  --muted:#9aa3b2;
-  --accent:#7dd3fc;
-  --text:#e6eef6;
-  --border: #1f2933;
-}
 *{box-sizing:border-box}
 html,body{height:100%}
 .site-wrapper{min-height:100vh;display:flex;flex-direction:column}
@@ -75,8 +56,18 @@ pre.code{background:#0b0f12;padding:14px;border-radius:8px;overflow:auto;color:v
 .right .card{min-height:120px}
 label{display:block;margin-bottom:8px;color:var(--muted);font-size:14px}
 textarea{width:100%;min-height:96px;background:#061018;border:1px solid rgba(32,48,58,0.6);color:var(--text);padding:12px;border-radius:10px}
-button{background:linear-gradient(180deg, rgba(125,211,252,0.04), rgba(125,211,252,0.01));border:1px solid rgba(125,211,252,0.16);color:var(--accent);padding:10px 14px;border-radius:10px;cursor:pointer}
-button:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(125,211,252,0.04)}
+.btn-copy{background:var(--accent);color:#05131a;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;box-shadow:0 8px 20px rgba(125,211,252,0.06);transition:transform .15s ease, box-shadow .15s ease}
+.btn-copy:hover{transform:translateY(-3px);box-shadow:0 18px 40px rgba(125,211,252,0.12)}
+
+/* Layout: vertical stack, centered content */
+.io-wrap{display:flex;flex-direction:column;gap:18px;align-items:center}
+.io-col{width:100%;max-width:720px;display:flex;flex-direction:column;gap:10px}
+.mode-toggle{width:52px;height:52px;border-radius:50%;background:linear-gradient(180deg, rgba(10,14,18,1), rgba(6,8,10,1));border:1px solid rgba(125,211,252,0.12);color:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .25s ease;margin:0 auto}
+.mode-toggle.rotate{transform:rotate(180deg)}
+
+/* Keep the tool card centered and compact */
+.card.full-height-tool{max-width:760px;margin:0 auto;padding:28px}
+
 .muted{color:var(--muted);font-weight:400;font-size:14px}
 .note{color:var(--muted);font-size:13px}
 .site-footer{padding:18px;text-align:center;color:var(--muted);font-size:13px}
@@ -87,4 +78,3 @@ button:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(125,211,252,
 
 .site-footer{padding:18px;text-align:center;color:var(--muted);font-size:13px;border-top:1px solid var(--border);}
 .site-footer .credit{color:var(--muted);font-size:13px}
-

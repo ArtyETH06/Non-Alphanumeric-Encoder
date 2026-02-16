@@ -1,63 +1,37 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Non-Alphanumeric-Decoder (NAD)</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <header class="site-header neon">
-    <div class="header-left">
-      <!-- simple SVG logo -->
-      <div class="logo" aria-hidden="true">
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="2" y="2" width="20" height="20" rx="4" fill="#071014" stroke="#7dd3fc" stroke-width="0.8"/>
-          <text x="50%" y="58%" fill="#7dd3fc" font-family="monospace" font-size="11" text-anchor="middle">NAD</text>
-        </svg>
-      </div>
-      <div>
-        <h1 class="logo-title">Non-Alphanumeric-Decoder <span class="muted">(NAD)</span></h1>
-        <p class="tag">Demo — bypassing a PHP validation using non-alphanumeric XOR</p>
-      </div>
-    </div>
-    <div class="header-right">
-      <nav class="top-nav">
-        <a href="index.html#exploit">Exploit</a>
-        <a href="encoder.html">Encoder</a>
-        <a href="decoder.html">Decoder</a>
-      </nav>
-    </div>
-  </header>
-  <main class="container single">
-    <section id="exploit" class="card">
-      <h2>Exploit — step by step</h2>
-      <ol>
-        <li>Find the vulnerable code snippet:
-          <pre class="code">if(!preg_match('/[a-zA-Z`]/', $_POST['input'])){ eval('print '.$_POST['input'].";"); }</pre>
-        </li>
-        <li>Understand the restriction: letters and the backtick <code>`</code> are blocked by the regex.</li>
-        <li>Use PHP's <code>^</code> operator (bitwise XOR) between two characters to produce a letter output
-            (e.g. <code>"#" ^ "@"</code> may produce <code>c</code> depending on ASCII codes).</li>
-        <li>Concatenate multiple XOR expressions using PHP's concatenation operator <code>.</code> to form a full string
-            (e.g. <code>("#"^"@").("!"^"@") ...</code>).</li>
-        <li>Submit the payload: the regex passes (no letters), then <code>eval</code> executes the reconstructed expression.</li>
-      </ol>
-      <p class="note">This is a pedagogical demo. Do not test this technique on systems you don't own or have permission to test.</p>
-    </section>
+  <!doctype html>
+  <html lang="en">
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width,initial-scale=1" />
+      <title>Non-Alphanumeric-Encoder — Redirect</title>
+      <meta http-equiv="refresh" content="0; url=src/html/index.html">
+    </head>
+    <body>
+      <p>Redirecting to <a href="src/html/index.html">src/html/index.html</a>. If your server doesn't follow redirects, open that file directly.</p>
+    </body>
+  </html>
 
-    <section class="card small">
-      <h3>Tip</h3>
-      <p>Multiple pairs of non-alphanumeric characters can XOR to the same letter. The generator picks the first
-      printable non-alphanumeric pair found for each character.</p>
+      <div id="decoder-panel" class="tool-panel hidden">
+        <label for="raw">Payload to decode</label>
+        <textarea id="raw" placeholder='e.g. ("["^"(") . ("$"^"]")'></textarea>
+        <div class="row">
+          <button id="decode">Decode</button>
+        </div>
+        <label for="decoded">Decoded result</label>
+        <textarea id="decoded" readonly></textarea>
+      </div>
     </section>
   </main>
 
   <footer class="site-footer">
-    <div class="credit">Non-Alphanumeric-Decoder — outil pédagogique. Ne l'utilisez pas pour des actions non autorisées.</div>
-    <div class="credit">dev by Arty</div>
+    <div class="credit">Non-Alphanumeric-Encoder tool — cause why not</div>
+    <div class="credit">By Arty</div>
   </footer>
 
+  </div><!-- .site-wrapper -->
   <script src="script.js"></script>
 </body>
 </html>
